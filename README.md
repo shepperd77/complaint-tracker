@@ -1,96 +1,104 @@
-# Complaint Tracker
+# Manufacturing Complaint Tracker
 
-Manufacturing complaint workflow tracker – V1 reconstruction and V2 data model.
+A portfolio project reconstructing an Excel-based manufacturing complaint workflow and developing it into a relational database-backed system.
 
-## Project
+## Project Overview
 
-This project reconstructs a real-world manufacturing complaint workflow originally implemented in Excel.
+The project is based on a real-world manufacturing process for handling customer complaints involving individual parts, quality checks, repair decisions, quotations, production, and outbound logistics.
 
-The original tracker has been used in a production environment for approximately one year. The project documents the original workflow, reverse-engineers its business logic, and uses that knowledge as the foundation for a database-backed V2.
+The original workflow was managed in Excel. The objective is to reconstruct the existing process, model its business rules, and gradually transform it into a structured, maintainable application.
 
-The project uses anonymized data and contains no real customer, complaint, part-number or serial-number data.
+The project is developed in stages, with each version building on the previous one.
 
-## V1 – Original Workflow
+## Development Roadmap
 
-The original tracker uses:
+### V1 — Excel Workflow Reconstruction
 
-* one row per complaint
-* process checkpoints represented by columns
-* responsible department assigned to each checkpoint
-* automatic workflow status using `IFS`
-* conditional formatting to visualize progress
-* `AKCE u` to identify the current responsible department
-* filtering by `AKCE u` to create working queues for each department
+**Status: Completed**
 
-### Workflow visualization
+Reconstructed and documented the original Excel-based complaint workflow.
 
-* **White** – complaint has not been started
-* **Green** – completed checkpoint
-* **Red** – current checkpoint / next required action
-* **Completed** – all checkpoints finished
+The reconstruction covers:
+- Workflow checkpoints and departmental responsibilities
+- Conditional formatting and visual process indicators
+- Identification of the next pending action
+- The original process structure and its practical limitations
 
-The V1 reconstruction focuses on reproducing the original process before redesigning it.
+This version provides the reference for subsequent development.
 
-## V2 – Data Model & Workflow Logic
+### V2 — Workflow Analysis and Business Rules
 
-V2 moves from spreadsheet-based workflow tracking toward a structured relational data model.
+**Status: Requirements established**
 
-The V2 specification defines:
+Analyzed the underlying manufacturing process to identify its entities, relationships, conditional branches, and operational requirements.
 
-* data types and field constraints
-* controlled lists and reference tables
-* mandatory and conditionally mandatory fields
-* nullable fields for skipped workflow branches
-* derived values and deadlines
-* workflow branching and applicability rules
-* separation of stored facts from derived workflow state
+Key areas include:
+- Customer and part identification
+- Claims containing multiple individual part lines
+- Repair eligibility and customer quotation decisions
+- Departmental responsibilities
+- Workflow deadlines and conditional steps
+- Return without repair and claim completion
 
-A key change from V1 is the workflow logic:
+The objective is to preserve the existing business logic while separating process requirements from the limitations of the original spreadsheet.
 
-> **V1:** the first empty checkpoint is the current action.
+### V3 — SQL Schema Design
 
-> **V2:** the first applicable checkpoint that has not been completed is the current action.
+**Status: Design completed**
 
-This allows the workflow to handle conditional branches without treating intentionally skipped fields as incomplete work.
+Designed the initial relational database structure for the complaint-tracking system.
 
-## Planned Architecture
+The design establishes:
+- Tables and their responsibilities
+- Primary keys and foreign-key relationships
+- Data types and field constraints
+- Reference tables for controlled values
+- Relationships between customers, claims, claim lines, and supporting records
+- Conditional workflow requirements for the repair process
 
-**V1**
-Excel workflow → reconstruction and documentation
+#### Key design decision: Claims vs. Claim Lines
 
-**V2**
-PostgreSQL → structured data model and workflow logic
+A claim represents the overall customer complaint. Each claim line represents an individual part moving through the repair workflow.
 
-**V3**
-Application / user interface → interaction with the database
+This distinction allows a single claim to contain multiple parts while tracking their repair progress independently.
 
-The database schema will be implemented only after the V2 process and data model have been fully specified.
+The design also accounts for composite primary keys, allowing line numbers to be unique within their respective claims rather than across the entire database.
 
-## Project Status
+### V4 — PostgreSQL Implementation and Validation
 
-### Completed
+**Status: Next phase**
 
-* V1 workflow reverse engineering
-* V1 workflow reconstruction
-* Workflow checkpoints and department ownership mapped
-* V1 status logic documented
-* V2 data dictionary created
-* V2 mandatory, conditional and derived field rules defined
-* V2 workflow branching logic defined
+Implement the designed schema in PostgreSQL and validate it using representative test data.
 
-### Next
+Planned work:
+- Create tables and reference data
+- Implement primary keys, foreign keys, and constraints
+- Test relationships and multi-line claims
+- Validate conditional repair workflows
+- Test deadline calculations and status handling
+- Refine the schema based on concrete test results
 
-* PostgreSQL schema design
-* Reference tables
-* Workflow definition
-* Sample anonymized data
-* Database implementation
+### V5 — Application Development
 
-## Repository Structure
+**Status: Planned**
 
-```text
-complaint-tracker/
-├── README.md
-├── complaint-tracker-v1-template.xlsx
-└── ...
-```
+Develop an application interface on top of the database.
+
+The aim is to make the complaint workflow usable without relying on the original spreadsheet, while preserving the underlying manufacturing process and its business rules.
+
+The implementation approach will be determined as the database foundation develops.
+
+## Technology Stack
+
+- **Excel** — original workflow reconstruction and schema planning
+- **PostgreSQL** — planned relational database implementation
+- **SQL** — schema definition, relationships, queries, and validation
+- **Application technologies** — to be determined during the application development phase
+
+## Current Status
+
+The project has progressed from reconstructing the original spreadsheet to completing the initial SQL schema design.
+
+The next milestone is implementing that design in PostgreSQL and testing it against realistic manufacturing complaint scenarios.
+
+This is an iterative project: design decisions will be revisited when testing identifies concrete issues, rather than attempting to anticipate every possible requirement before implementation begins.
